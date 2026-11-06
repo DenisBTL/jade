@@ -1,0 +1,53 @@
+# Jade d’Albenas : site internet
+
+Site autonome de présentation de Jade, Gestalt-thérapeute à Rennes.
+
+- Quatre pages : accueil, thérapie, approche et contact.
+- Fonds ivoire et beige, paysage inspiré du kintsugi.
+- Eau animée avec grandes ondes au clic, brise et petites feuilles.
+- Pause commune et respect du réglage de mouvement réduit.
+- Affichage adapté au téléphone et à l’ordinateur, navigation au clavier.
+
+## Modifier et consulter
+
+Le contenu est dans `build.py`. Styles, images et scripts : `dist/assets/`.
+Python 3 suffit à régénérer les pages, sans dépendance :
+
+```sh
+python build.py
+python -m http.server 8792 --directory dist
+```
+
+Ouvrir http://localhost:8792/. Les liens absolus nécessitent un serveur HTTP.
+
+## GitHub Pages
+
+Le modèle `docs/github-pages.workflow.yml` génère le site, exporte les liens sous
+le préfixe du dépôt et déploie sur GitHub Pages. Aucun paquet npm nécessaire.
+Pour activer la publication automatique, déplacer ce fichier vers
+`.github/workflows/pages.yml`, avec un accès autorisant la modification des workflows,
+puis activer GitHub Pages avec la source GitHub Actions dans les paramètres du dépôt.
+
+```sh
+python build.py
+node export-pages.mjs
+```
+
+L’export est créé dans `outputs/pages/`. Adresse attendue après activation et
+publication réussie : https://denisbtl.github.io/jade/.
+Le préfixe utilise `GITHUB_REPOSITORY` ou `jade` par défaut.
+Les sources restent utilisables à la racine sur un autre hébergeur.
+
+## Vérification
+
+`check_site.py` et `check_water.py` nécessitent Playwright et Pillow. Avec un
+serveur sur le port 8792, ils contrôlent les pages, le clavier, les liens, les
+textes, le responsive, les animations, le clic/toucher, la pause et le mouvement réduit.
+Choix visuels et critères UX/UI : `docs/CONCEPTION.md`.
+Prompts des images : `assets-prompts.json`.
+
+## Avant ouverture définitive
+
+Textes et FAQ à valider par Jade. Coordonnées, adresse, horaires, tarifs, durée
+et mentions légales complètes à renseigner. Le site reste marqué `noindex`.
+Aucun formulaire ni suivi d’audience ajouté. Aucun jeton ou journal local livré.

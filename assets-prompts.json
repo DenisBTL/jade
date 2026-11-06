@@ -1,0 +1,17 @@
+{
+  "generation": "Outil intégré image_gen, aucune utilisation de la CLI",
+  "assets": [
+    {
+      "path": "dist/assets/paysage-kintsugi-v3.webp",
+      "prompt": "Use case: stylized-concept. Asset type: wide landscape background for the homepage of a French Gestalt therapist, not a website mockup. Create one elegant landscape image in a very wide 2:1 landscape composition, at least 2304 pixels wide. A quiet coastal lake with layers of misty blue and lilac mountains on the RIGHT, a pale warm ivory sky and haze filling the LEFT half. Fine photographic-watercolor texture with softly brushed paper, matte natural light, low contrast, sophisticated editorial art direction. Inspired by Japanese kintsugi, one very fine organic metallic golden repair seam runs diagonally from the lower left quarter through the shoreline at bottom center, branching softly toward the upper right. The gold should be irregular, delicate and understated. Colors: warm ivory #f8f7f3, periwinkle #667a98, muted lilac #8a7bb5, deep indigo #273873, soft gold #d7b85a. Composition is crucial: the left 48 percent and upper left must remain almost empty warm ivory with only an extremely faint wash, suitable behind real dark-blue website typography. Mountains and water gain detail only across the right half and bottom third. Place a calm winding shoreline and gentle water reflections across lower right. No person, no building, no feathers, no religious or spiritual symbols. Absolutely NO text, NO letters, NO logo, NO typography, NO interface, NO framing or collage. Finished full bleed landscape art only."
+    },
+    {
+      "path": "dist/assets/petales-v3.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: supporting photograph for a French therapist's website. Single full bleed landscape photograph, no collage. Extreme close-up of softly overlapping magnolia flower petals, colored muted periwinkle and deep indigo with an ivory center illuminated by a small touch of warm golden natural light. Shallow depth of field, soft matte grain, tactile real petal texture, calm understated editorial botanical still life. The composition is abstract, elegant and quiet. Palette ivory #f8f7f3, periwinkle #667a98, lilac #8a7bb5, indigo #273873. No feathers, no birds, no people, no text, no logo, no border, no illustration."
+    },
+    {
+      "path": "dist/assets/ombres-vegetales-v3.webp",
+      "prompt": "Use case: photorealistic-natural. Asset type: supporting photograph for a French therapist's website. Single full bleed landscape image. Soft natural afternoon light falls across an ivory and pale lavender limewashed wall. Delicate shadows of a few meadow grasses and small botanical stems enter from the lower right. Muted lavender shadows, warm ivory highlights, subtle real plaster texture, contemplative calm, warm but restrained editorial photography. Airy minimal composition with broad quiet space. No actual vase or objects visible, only botanical shadows. No feather, no people, no text, no logo, no border."
+    }
+  ]
+}
