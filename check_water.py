@@ -55,7 +55,7 @@ with sync_playwright() as p:
         water_area = (20, int(h * .83), w - 20, h - 65)
         top = difference(first, second, top_area)
         idle = difference(first, second, water_area)
-        local_area = (max(20, int(w * .56 - 180)), int(h * .83), min(w - 20, int(w * .56 + 180)), h - 65)
+        local_area = (max(20, int(w * .80 - 180)), int(h * .83), min(w - 20, int(w * .80 + 180)), h - 65)
         idle_mean = mean_difference(first, second, local_area)
         foliage_changes = difference(first, second, foliage_area)
         assert foliage_changes > 100, (width, 'Feuillages immobiles', foliage_changes)
@@ -70,7 +70,7 @@ with sync_playwright() as p:
             assert not (copy['x'] <= leaf['x'] + hero_rect['x'] <= copy['x'] + copy['width'] and copy['y'] <= leaf['y'] + hero_rect['y'] <= copy['y'] + copy['height']), (width, 'Feuille sur le texte', leaf)
         before_click = capture(page)
         rect = page.locator('.home-hero').bounding_box()
-        click_x, click_y = rect['x'] + w * .56, rect['y'] + h * .90
+        click_x, click_y = rect['x'] + w * .80, rect['y'] + h * .90
         if width == 390:
             page.touchscreen.tap(click_x, click_y)
         else:
@@ -83,18 +83,17 @@ with sync_playwright() as p:
         assert strong_mean > idle_mean * 1.6, (width, 'Onde trop faible par rapport au repos', idle_mean, strong_mean)
         assert difference(before_click, clicked, top_area) == 0, 'Le clic ne doit pas déformer les montagnes'
         clicked.save(OUT / f'onde-clic-{width}.png')
-        page.get_by_role('button', name='Mettre les animations du paysage en pause').click()
+        page.keyboard.press('Escape')
         page.wait_for_timeout(100)
         paused = capture(page)
         paused_count = page.evaluate('window.__waterDraws')
         page.wait_for_timeout(900)
         assert page.evaluate('window.__waterDraws') == paused_count
         assert difference(paused, capture(page), (0, 0, w, h)) == 0
-        assert page.locator('.water-toggle').get_attribute('aria-pressed') == 'true'
-        # Le bouton d'eau est utilisable au clavier et relance une image en pause.
-        page.get_by_role('button', name='Créer une grande onde dans l’eau').focus()
-        page.keyboard.press('Enter')
-        assert page.locator('.water-toggle').get_attribute('aria-pressed') == 'false'
+        assert page.locator('canvas').get_attribute('data-motion-state') == 'paused'
+        # Le paysage peut être suspendu et repris au clavier sans commande visible.
+        page.keyboard.press('Escape')
+        assert page.locator('canvas').get_attribute('data-motion-state') == 'running'
         page.wait_for_timeout(5500)
         # Après amortissement, retour aux bandes légères du mouvement de repos.
         count = page.evaluate('window.__waveFrames')
@@ -108,35 +107,32 @@ with sync_playwright() as p:
         assert page.evaluate('window.__waterDraws') == snapshot
         page.evaluate('window.scrollTo(0, 0)')
         page.emulate_media(reduced_motion='reduce')
-        assert not page.locator('.water-toggle').is_visible()
-        assert not page.locator('.water-splash').is_visible()
+        assert page.locator('.water-toggle,.water-splash').count() == 0
         assert not page.locator('canvas').is_visible()
         assert not errors, errors
         report.append({'width': width, 'interaction': 'toucher' if width == 390 else 'clic', 'sky_and_mountains_changed_pixels': top, 'foliage_changed_pixels': foliage_changes, 'leaves_near_vegetation': True, 'idle_mean_difference': idle_mean, 'click_mean_difference': strong_mean, 'strong_wave_pixels': strong, 'pause_all_effects': True, 'keyboard': True, 'fade_out': True, 'offscreen_stops': True, 'reduced_motion': True})
         page.close()
     page = browser.new_page(viewport={'width': 390, 'height': 900}, reduced_motion='reduce')
     page.goto(BASE)
-    assert not page.locator('.water-toggle').is_visible()
+    assert page.locator('.water-toggle,.water-splash').count() == 0
     assert not page.locator('.home-water-canvas').get_attribute('class').endswith('is-ready')
     page.close()
     page = browser.new_page(viewport={'width': 390, 'height': 900})
     page.add_init_script("const original = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function(type, ...args) { return type.includes('webgl') ? null : original.call(this, type, ...args); };")
     page.goto(BASE)
     page.wait_for_selector('.home-water-canvas.is-ready')
-    assert page.locator('.water-splash').is_visible(), 'Effet requis même sans WebGL'
-    page.get_by_role('button', name='Créer une grande onde dans l’eau').focus()
-    page.keyboard.press('Space')
+    assert page.locator('.scene-next-water').is_visible(), 'Navigation requise même sans WebGL'
     page.close()
     page = browser.new_page(viewport={'width': 390, 'height': 900})
     page.add_init_script("HTMLCanvasElement.prototype.getContext = () => null;")
     page.goto(BASE)
-    assert not page.locator('.water-toggle').is_visible()
+    assert page.locator('.water-toggle,.water-splash').count() == 0
     assert page.locator('.home-landscape').evaluate('(i) => i.complete && i.naturalWidth > 0')
     page.close()
     page = browser.new_page(viewport={'width': 390, 'height': 900}, java_script_enabled=False)
     page.goto(BASE)
     assert page.locator('h1').is_visible()
-    assert not page.locator('.water-toggle').is_visible()
+    assert page.locator('.water-toggle,.water-splash').count() == 0
     page.close()
     browser.close()
 result = {'animation': report, 'initial_reduced_motion': True, 'works_without_webgl': True, 'without_canvas': True, 'without_javascript': True}

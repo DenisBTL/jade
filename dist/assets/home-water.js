@@ -3,9 +3,7 @@
   const hero = document.querySelector('.home-hero');
   const image = hero?.querySelector('.home-landscape');
   const canvas = hero?.querySelector('.home-water-canvas');
-  const toggle = hero?.querySelector('.water-toggle');
-  const splash = hero?.querySelector('.water-splash');
-  if (!image || !canvas || !toggle || !splash) return;
+  if (!image || !canvas) return;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let context;
   let initialized = false;
@@ -149,8 +147,7 @@
     failed = true;
     stop();
     canvas.classList.remove('is-ready');
-    toggle.hidden = true;
-    splash.hidden = true;
+    canvas.dataset.motionState = 'static';
   }
 
   function renderPulse() {
@@ -343,31 +340,39 @@
   function sync() {
     initialize();
     const enabled = initialized && !failed && !reducedMotion.matches;
-    toggle.hidden = !enabled;
-    splash.hidden = !enabled;
     canvas.classList.toggle('is-ready', enabled);
-    toggle.setAttribute('aria-pressed', String(paused));
-    toggle.setAttribute('aria-label', paused ? 'Animer le paysage' : 'Mettre les animations du paysage en pause');
-    toggle.querySelector('.water-toggle-text').textContent = paused ? 'Reprendre' : 'Pause';
-    toggle.querySelector('.water-toggle-icon').textContent = paused ? '▷' : 'Ⅱ';
+    canvas.dataset.motionState = enabled ? (paused ? 'paused' : 'running') : 'static';
     if (enabled && !paused && visible && !document.hidden) {
       if (!frame) frame = requestAnimationFrame(tick);
     } else stop();
   }
 
-  splash.addEventListener('click', event => {
+  function ripple(x, y) {
     if (!initialized || failed || reducedMotion.matches) return;
-    const rect = hero.getBoundingClientRect();
-    // Entrée / Espace déclenchent l'onde au centre du lac.
-    const x = event.detail === 0 ? width * 0.5 : event.clientX - rect.left;
-    const y = event.detail === 0 ? height * 0.91 : event.clientY - rect.top;
     hits.push({ x, y, at: elapsed });
     hits = hits.slice(-4);
     paused = false;
     render();
     sync();
+  }
+  hero.addEventListener('jade:water-ripple', event => {
+    const rect = hero.getBoundingClientRect();
+    ripple(event.detail?.x ?? rect.width * 0.5, event.detail?.y ?? rect.height * 0.9);
   });
-  toggle.addEventListener('click', () => { paused = !paused; sync(); });
+  hero.addEventListener('click', event => {
+    if (event.target.closest('a,button,input,summary')) return;
+    const rect = hero.getBoundingClientRect();
+    const x = event.clientX - rect.left, y = event.clientY - rect.top;
+    const u = (x - offsetX) / scale / image.naturalWidth;
+    const shore = shoreAt(u) * image.naturalHeight * scale + offsetY;
+    if (y > shore) ripple(x, y);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.defaultPrevented || event.key !== 'Escape' || document.querySelector('dialog[open]') || document.querySelector('.menu-toggle[aria-expanded="true"]')) return;
+    if (!initialized || reducedMotion.matches || !visible) return;
+    paused = !paused;
+    sync();
+  });
   reducedMotion.addEventListener('change', sync);
   document.addEventListener('visibilitychange', sync);
   canvas.addEventListener('contextlost', unavailable);

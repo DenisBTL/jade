@@ -5,7 +5,9 @@ Site autonome de présentation de Jade, Gestalt-thérapeute à Rennes.
 - Quatre pages : accueil, thérapie, approche et contact.
 - Fonds ivoire et beige, paysage inspiré du kintsugi.
 - Eau animée avec grandes ondes au clic, brise et petites feuilles.
-- Pause commune et respect du réglage de mouvement réduit.
+- Barre de progression, repères latéraux et chevrons entre les tableaux.
+- Premier chevron dans l’eau : onde puis descente, interrompable au toucher ou à la molette.
+- Pause au clavier (Échap) et respect du réglage de mouvement réduit.
 - Affichage adapté au téléphone et à l’ordinateur, navigation au clavier.
 
 ## Modifier et consulter
@@ -39,9 +41,9 @@ Les sources restent utilisables à la racine sur un autre hébergeur.
 
 ## Vérification
 
-`check_site.py` et `check_water.py` nécessitent Playwright et Pillow. Avec un
+`check_site.py`, `check_water.py` et `check_reading.py` nécessitent Playwright et Pillow. Avec un
 serveur sur le port 8792, ils contrôlent les pages, le clavier, les liens, les
-textes, le responsive, les animations, le clic/toucher, la pause et le mouvement réduit.
+textes, le responsive, les animations, le clic/toucher, la pause, le mouvement réduit, la progression et les déplacements entre tableaux.
 Choix visuels et critères UX/UI : `docs/CONCEPTION.md`.
 Prompts des images : `assets-prompts.json`.
 

@@ -236,3 +236,33 @@ Ces balises ne remplacent pas le contrôle d’accès privé de l’hébergeur.
 - Critères : pas de rupture de couleur aux jonctions ; arbres visiblement animés
   sans mouvement du ciel ou des montagnes ; feuilles issues de la zone boisée ;
   pause stable, grandes ondes toujours possibles et aucun débordement horizontal.
+
+
+## Préconisation UX/UI : navigation de lecture commune à Pepper et Mon Chai
+
+- Priorité / problème : P1, remplacer les commandes techniques de l’eau par les
+  conventions de lecture des autres sites de Denis.
+- Références : barre de lecture et tirets de `landing_final_episode_2/index.html` ;
+  `.readbar`, `.scene-nav`, `.scene-next` et défilement amorti de
+  `DenisBTL/pepper_maquette`, `bleu/css/site.css` et `bleu/js/site.js`.
+- Point d’entrée : accueil, chevron centré sur l’eau, puis chevrons en fin de tableau.
+- Hiérarchie : progression en haut, tableau actif en tirets sur grand écran,
+  action discrète vers le tableau suivant ; aucun bouton Cliquer sur l’eau ou Pause.
+- États : début/en cours/fin de lecture, tableau actif, déplacement déclenché,
+  annulation au scroll/toucher/clavier, mouvement réduit, JavaScript indisponible.
+- Feedback : la première flèche provoque une onde à son emplacement puis rejoint
+  les accompagnements ; les autres flèches rejoignent le tableau suivant. Les tirets
+  indiquent le tableau courant, leur intitulé apparaît au survol ou au focus.
+- Données : cinq tableaux nommés, sans collecte, sans changement de route serveur.
+- Responsive : barre fine sur tous les formats ; tirets uniquement à partir de
+  1340 px et 600 px de haut ; chevrons accessibles sur téléphone, sans cadre extérieur.
+- Accessibilité : vrais liens d’ancre, clavier et focus à l’arrivée, intitulés
+  explicites, mouvement réduit sans onde ni défilement animé. Échap suspend/reprend
+  le paysage sans contrôle visible supplémentaire ; cette possibilité est décrite
+  aux lecteurs d’écran. Le scroll manuel conserve toujours la priorité.
+- Cohérence : anneau et chevron des références, adaptés aux tons de Jade ; fondus,
+  végétation et lisibilité conservés. Aucune apparition de contenu au défilement.
+- Critères : aucune ancienne commande visible ; première flèche dans la zone d’eau,
+  onde avant départ, toutes les ancres atteignables et focus correct ; barre 0–100 %,
+  tableau actif correct ; annulation fiable, menu non masqué, aucun débordement et
+  parcours fonctionnel sans JavaScript et avec mouvement réduit.

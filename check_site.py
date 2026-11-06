@@ -22,7 +22,7 @@ with sync_playwright() as p:
             assert page.locator('h1').count() == 1
             assert page.locator('html').get_attribute('lang') == 'fr'
             assert page.locator('main p:not(.eyebrow):not(.hero-meta):not(.home-location):not(.small-note):not(.quote-signature)').evaluate_all('(els) => els.every(e => parseFloat(getComputedStyle(e).fontSize) >= 18)'), (route, width, 'paragraphes trop petits')
-            assert page.locator('summary, .button, .text-link, .legal-open, .water-toggle, .water-splash').evaluate_all('(els) => els.every(e => parseFloat(getComputedStyle(e).fontSize) >= 16)'), (route, width, 'contrôles trop petits')
+            assert page.locator('summary, .button, .text-link, .legal-open, .scene-next').evaluate_all('(els) => els.every(e => parseFloat(getComputedStyle(e).fontSize) >= 16)'), (route, width, 'contrôles trop petits')
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (route, width, page.evaluate("Array.from(document.querySelectorAll('body *')).filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,cls:e.className,right:e.getBoundingClientRect().right,width:e.getBoundingClientRect().width})).slice(0,15)"))
             page.locator('img').evaluate_all('(images) => images.forEach(i => i.loading = "eager")')
             page.wait_for_function('Array.from(document.images).every(i => i.complete)')

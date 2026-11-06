@@ -11,6 +11,7 @@ toggle.addEventListener('click', () => {
 });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+    event.preventDefault();
     closeMenu();
     toggle.focus();
   }
