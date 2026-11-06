@@ -22,11 +22,10 @@ Ouvrir http://localhost:8792/. Les liens absolus nécessitent un serveur HTTP.
 
 ## GitHub Pages
 
-Le modèle `docs/github-pages.workflow.yml` génère le site, exporte les liens sous
-le préfixe du dépôt et déploie sur GitHub Pages. Aucun paquet npm nécessaire.
-Pour activer la publication automatique, déplacer ce fichier vers
-`.github/workflows/pages.yml`, avec un accès autorisant la modification des workflows,
-puis activer GitHub Pages avec la source GitHub Actions dans les paramètres du dépôt.
+Le workflow `.github/workflows/pages.yml` génère le site, exporte les liens sous
+le préfixe du dépôt et déploie sur GitHub Pages à chaque push sur `main`.
+Aucun paquet npm nécessaire. GitHub Pages utilise la source GitHub Actions
+dans les paramètres du dépôt.
 
 ```sh
 python build.py
