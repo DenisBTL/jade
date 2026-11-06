@@ -1,4 +1,4 @@
-﻿/* Reflets Canvas 2D : aucun besoin d'accélération graphique ou de WebGL. */
+/* Reflets Canvas 2D : aucun besoin d'accélération graphique ou de WebGL. */
 (() => {
   const hero = document.querySelector('.home-hero');
   const image = hero?.querySelector('.home-landscape');
@@ -30,8 +30,15 @@
   let wavePixels;
   let startRow = 0;
   let columnShores;
-  let foliagePath;
   let foliageBounds;
+  let foliageCanvas;
+  let foliageContext;
+  let foliagePixels;
+  let foliageWeights;
+  let foliageAlpha;
+  let foliageStartX;
+  let foliageStartY;
+  let visibleLeaves = [];
   const canopy = [[0.49,0.752],[0.52,0.742],[0.54,0.690],[0.575,0.670],
     [0.61,0.672],[0.645,0.700],[0.67,0.680],[0.70,0.660],[0.74,0.634],
     [0.77,0.642],[0.80,0.637],[0.83,0.665],[0.85,0.668],[0.88,0.654],
@@ -39,14 +46,13 @@
   const treeBases = [[1,0.741],[0.95,0.745],[0.90,0.737],[0.86,0.740],
     [0.80,0.743],[0.75,0.732],[0.70,0.740],[0.65,0.735],[0.60,0.750],
     [0.55,0.756],[0.49,0.766]];
-  const leaves = [
-    { x: 0.565, phase: 0.06, duration: 10, size: 6, color: '#77638d' },
-    { x: 0.630, phase: 0.30, duration: 12, size: 5, color: '#667492' },
-    { x: 0.720, phase: 0.56, duration: 11, size: 7, color: '#aa905e' },
-    { x: 0.800, phase: 0.76, duration: 13, size: 5, color: '#88739c' },
-    { x: 0.900, phase: 0.19, duration: 12, size: 6, color: '#67758b' },
-    { x: 0.975, phase: 0.61, duration: 14, size: 7, color: '#a58a59' },
-  ];
+  const leaves = Array.from({ length: 13 }, (_, i) => ({
+    x: 0.54 + i * 0.036,
+    phase: (0.12 + i * 0.271) % 1,
+    duration: 9 + (i % 4) * 1.1,
+    size: 6 + (i % 3),
+    color: ['#756383', '#6c7890', '#a38b5d', '#8a7299'][i % 4],
+  }));
 
   function canopyAt(x) {
     for (let i = 1; i < canopy.length; i++) {
@@ -60,34 +66,50 @@
   }
 
   function renderFoliage() {
-    context.save();
-    context.clip(foliagePath);
-    const { left, right, top, bottom } = foliageBounds;
-    for (let y = top; y < bottom; y += 3) {
-      for (let x = left; x < right; x += 64) {
-        const tile = Math.min(64, right - x);
-        const sourceX = ((x + tile / 2) - offsetX) / scale / image.naturalWidth;
-        const crownY = canopyAt(sourceX) * image.naturalHeight * scale + offsetY;
-        const sway = Math.max(0, Math.min(1, (bottom - y) / Math.max(1, bottom - crownY)));
-        const dx = (Math.sin(elapsed * 0.85 + x * 0.012) * 1.5 + Math.sin(elapsed * 0.31) * 0.8) * sway;
-        const dy = Math.sin(elapsed * 0.7 + x * 0.008) * 0.35 * sway;
-        context.drawImage(image, (x - dx - offsetX) / scale, (y - dy - offsetY) / scale,
-          tile / scale, 3 / scale, x, y, tile, 3);
+    const pixels = foliagePixels.data;
+    const original = sourcePixels.data;
+    const pixelWidth = canvas.width;
+    const wind = Math.sin(elapsed * 0.38) * 3.2;
+    for (let row = 0; row < foliageCanvas.height; row++) {
+      const y = (foliageStartY + row + 0.5) / ratio;
+      for (let col = 0; col < foliageCanvas.width; col++) {
+        const cell = row * foliageCanvas.width + col;
+        const index = cell * 4;
+        const alpha = foliageAlpha[cell];
+        pixels[index + 3] = alpha;
+        if (alpha === 0) continue;
+        const x = (foliageStartX + col + 0.5) / ratio;
+        const spring = foliageWeights[cell];
+        const dx = (Math.sin(elapsed * 0.92 + x * 0.023) * 2.8
+          + Math.sin(elapsed * 0.47 + x * 0.007) * 2.2 + wind) * spring;
+        const dy = Math.sin(elapsed * 0.8 + x * 0.015) * 1.15 * spring;
+        const sx = Math.max(0, Math.min(pixelWidth - 1.001, (x - dx) * ratio));
+        const sy = Math.max(0, Math.min(canvas.height - 1.001, (y - dy) * ratio));
+        const ix = Math.floor(sx), iy = Math.floor(sy);
+        const fx = sx - ix, fy = sy - iy;
+        const upper = (iy * pixelWidth + ix) * 4;
+        const lower = upper + pixelWidth * 4;
+        for (let channel = 0; channel < 3; channel++) {
+          const a = original[upper + channel] * (1 - fx) + original[upper + 4 + channel] * fx;
+          const b = original[lower + channel] * (1 - fx) + original[lower + 4 + channel] * fx;
+          pixels[index + channel] = a * (1 - fy) + b * fy;
+        }
       }
     }
-    context.restore();
+    foliageContext.putImageData(foliagePixels, 0, 0);
+    context.drawImage(foliageCanvas, foliageStartX / ratio, foliageStartY / ratio,
+      foliageCanvas.width / ratio, foliageCanvas.height / ratio);
   }
 
   function renderLeaves() {
-    const count = width <= 700 ? 4 : leaves.length;
-    for (let i = 0; i < count; i++) {
-      const leaf = leaves[i];
+    for (let i = 0; i < visibleLeaves.length; i++) {
+      const leaf = visibleLeaves[i];
       const progress = (elapsed / leaf.duration + leaf.phase) % 1;
-      const x = (leaf.x + progress * 0.024 + Math.sin(elapsed * 0.65 + i * 2.1) * 0.006) * image.naturalWidth * scale + offsetX;
-      const y = (canopyAt(leaf.x) + 0.012 + progress * 0.14) * image.naturalHeight * scale + offsetY;
+      const x = (leaf.x + progress * 0.038 + Math.sin(elapsed * 0.75 + i * 2.1) * 0.009) * image.naturalWidth * scale + offsetX;
+      const y = (canopyAt(leaf.x) + 0.008 + progress * 0.105) * image.naturalHeight * scale + offsetY;
       if (x < -10 || x > width + 10 || y < 0 || y > height - 65) continue;
-      const opacity = Math.min(1, progress / 0.12, (1 - progress) / 0.25) * 0.68;
-      const size = Math.max(4, Math.min(8, leaf.size * scale));
+      const opacity = Math.min(1, progress / 0.12, (1 - progress) / 0.25) * 0.82;
+      const size = Math.max(5, Math.min(9, leaf.size * scale));
       context.save();
       context.globalAlpha = opacity;
       context.translate(x, y);
@@ -220,17 +242,6 @@
     const mobile = matchMedia('(max-width: 700px)').matches;
     offsetX = (width - image.naturalWidth * scale) * (mobile ? 0.57 : 0.5);
     offsetY = (height - image.naturalHeight * scale) * (mobile ? 1 : 0.5);
-    foliagePath = new Path2D();
-    const foliagePoints = [...canopy, ...treeBases].map(([x, y]) =>
-      [x * image.naturalWidth * scale + offsetX, y * image.naturalHeight * scale + offsetY]);
-    foliagePoints.forEach(([x, y], index) => index === 0 ? foliagePath.moveTo(x, y) : foliagePath.lineTo(x, y));
-    foliagePath.closePath();
-    foliageBounds = {
-      left: Math.max(0, Math.floor(Math.min(...foliagePoints.map(p => p[0])))),
-      right: Math.min(width, Math.ceil(Math.max(...foliagePoints.map(p => p[0])))),
-      top: Math.max(0, Math.floor(Math.min(...foliagePoints.map(p => p[1])))),
-      bottom: Math.min(height, Math.ceil(Math.max(...foliagePoints.map(p => p[1])))),
-    };
     waterPath = new Path2D();
     waterPath.moveTo(0, height);
     waterTop = height;
@@ -260,6 +271,52 @@
     for (let col = 0; col < canvas.width; col++) {
       columnShores[col] = shoreAt(((col + 0.5) / ratio - offsetX) / scale / image.naturalWidth) * image.naturalHeight * scale + offsetY;
     }
+    const pointAt = (points, x) => {
+      for (let i = 1; i < points.length; i++) {
+        if (x <= points[i][0]) {
+          const a = points[i - 1], b = points[i];
+          const t = Math.max(0, Math.min(1, (x - a[0]) / (b[0] - a[0])));
+          return a[1] + (b[1] - a[1]) * t;
+        }
+      }
+      return points[points.length - 1][1];
+    };
+    const bases = [...treeBases].reverse();
+    const points = [...canopy, ...treeBases].map(([x, y]) =>
+      [x * image.naturalWidth * scale + offsetX, y * image.naturalHeight * scale + offsetY]);
+    foliageBounds = {
+      left: Math.max(0, Math.floor(Math.min(...points.map(p => p[0])))),
+      right: Math.min(width, Math.ceil(Math.max(...points.map(p => p[0])))),
+      top: Math.max(0, Math.floor(Math.min(...points.map(p => p[1])))),
+      bottom: Math.min(height, Math.ceil(Math.max(...points.map(p => p[1])))),
+    };
+    foliageStartX = Math.floor(foliageBounds.left * ratio);
+    foliageStartY = Math.floor(foliageBounds.top * ratio);
+    foliageCanvas = document.createElement('canvas');
+    foliageCanvas.width = Math.max(1, Math.ceil(foliageBounds.right * ratio) - foliageStartX);
+    foliageCanvas.height = Math.max(1, Math.ceil(foliageBounds.bottom * ratio) - foliageStartY);
+    foliageContext = foliageCanvas.getContext('2d');
+    foliagePixels = foliageContext.createImageData(foliageCanvas.width, foliageCanvas.height);
+    foliageWeights = new Float32Array(foliageCanvas.width * foliageCanvas.height);
+    foliageAlpha = new Uint8Array(foliageWeights.length);
+    for (let col = 0; col < foliageCanvas.width; col++) {
+      const x = (foliageStartX + col + 0.5) / ratio;
+      const u = (x - offsetX) / scale / image.naturalWidth;
+      const top = canopyAt(u) * image.naturalHeight * scale + offsetY;
+      const bottom = pointAt(bases, u) * image.naturalHeight * scale + offsetY;
+      for (let row = 0; row < foliageCanvas.height; row++) {
+        const y = (foliageStartY + row + 0.5) / ratio;
+        const index = row * foliageCanvas.width + col;
+        foliageAlpha[index] = Math.round(Math.max(0, Math.min(1, (y - top) / 3.5, (bottom - y) / 4)) * 255);
+        foliageWeights[index] = Math.max(0, Math.min(1, (bottom - y) / Math.max(1, bottom - top)));
+      }
+    }
+    const candidates = leaves.filter(leaf => {
+      const x = leaf.x * image.naturalWidth * scale + offsetX;
+      return x > 5 && x < width - 5;
+    });
+    const count = Math.min(candidates.length, width <= 700 ? 5 : 9);
+    visibleLeaves = Array.from({ length: count }, (_, i) => candidates[Math.floor(i * candidates.length / count)]);
     hits = [];
     render();
   }

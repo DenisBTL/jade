@@ -1,4 +1,4 @@
-﻿"""Vérifie les pixels : mouvement de repos, grande onde au clic, pause et secours."""
+"""Vérifie les pixels : mouvement de repos, grande onde au clic, pause et secours."""
 from io import BytesIO
 from pathlib import Path
 import json
@@ -26,7 +26,23 @@ with sync_playwright() as p:
         page = browser.new_page(viewport={'width': width, 'height': 1000}, has_touch=width == 390)
         errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
-        page.add_init_script("window.__waterDraws = 0; window.__waveFrames = 0; const draw = CanvasRenderingContext2D.prototype.drawImage; const put = CanvasRenderingContext2D.prototype.putImageData; CanvasRenderingContext2D.prototype.drawImage = function(...a) { window.__waterDraws++; return draw.apply(this,a); }; CanvasRenderingContext2D.prototype.putImageData = function(...a) { window.__waveFrames++; return put.apply(this,a); };")
+        page.add_init_script("""window.__waterDraws = 0; window.__waveFrames = 0; window.__leafPositions = [];
+        const draw = CanvasRenderingContext2D.prototype.drawImage;
+        const fill = CanvasRenderingContext2D.prototype.fill;
+        CanvasRenderingContext2D.prototype.drawImage = function(...a) {
+          window.__waterDraws++;
+          const main = document.querySelector('.home-water-canvas');
+          if (a[0] instanceof HTMLCanvasElement && main && a[0].width === main.width) window.__waveFrames++;
+          return draw.apply(this,a);
+        };
+        CanvasRenderingContext2D.prototype.fill = function(...a) {
+          if (this.canvas.classList.contains('home-water-canvas')) {
+            const t = this.getTransform(), r = this.canvas.getBoundingClientRect();
+            window.__leafPositions.push({x:t.e*r.width/this.canvas.width,y:t.f*r.height/this.canvas.height});
+            if (window.__leafPositions.length>300) window.__leafPositions.shift();
+          }
+          return fill.apply(this,a);
+        };""")
         page.goto(BASE)
         page.wait_for_selector('.home-water-canvas.is-ready')
         page.wait_for_timeout(200)
@@ -42,9 +58,16 @@ with sync_playwright() as p:
         local_area = (max(20, int(w * .56 - 180)), int(h * .83), min(w - 20, int(w * .56 + 180)), h - 65)
         idle_mean = mean_difference(first, second, local_area)
         foliage_changes = difference(first, second, foliage_area)
-        assert foliage_changes > 20, (width, 'Feuillages immobiles', foliage_changes)
+        assert foliage_changes > 100, (width, 'Feuillages immobiles', foliage_changes)
         assert top == 0, (width, 'Le haut du paysage bouge', top)
         assert idle > 50, (width, 'Eau immobile', idle)
+        leaf_positions = page.evaluate('window.__leafPositions')
+        assert len(leaf_positions) > 5, (width, 'Feuilles absentes')
+        copy = page.locator('.home-hero-copy').bounding_box()
+        hero_rect = page.locator('.home-hero').bounding_box()
+        for leaf in leaf_positions:
+            assert leaf['y'] > h * .5, (width, 'Feuille en dehors de la rive', leaf)
+            assert not (copy['x'] <= leaf['x'] + hero_rect['x'] <= copy['x'] + copy['width'] and copy['y'] <= leaf['y'] + hero_rect['y'] <= copy['y'] + copy['height']), (width, 'Feuille sur le texte', leaf)
         before_click = capture(page)
         rect = page.locator('.home-hero').bounding_box()
         click_x, click_y = rect['x'] + w * .56, rect['y'] + h * .90
@@ -89,7 +112,7 @@ with sync_playwright() as p:
         assert not page.locator('.water-splash').is_visible()
         assert not page.locator('canvas').is_visible()
         assert not errors, errors
-        report.append({'width': width, 'interaction': 'toucher' if width == 390 else 'clic', 'sky_and_mountains_changed_pixels': top, 'foliage_changed_pixels': foliage_changes, 'idle_mean_difference': idle_mean, 'click_mean_difference': strong_mean, 'strong_wave_pixels': strong, 'pause_all_effects': True, 'keyboard': True, 'fade_out': True, 'offscreen_stops': True, 'reduced_motion': True})
+        report.append({'width': width, 'interaction': 'toucher' if width == 390 else 'clic', 'sky_and_mountains_changed_pixels': top, 'foliage_changed_pixels': foliage_changes, 'leaves_near_vegetation': True, 'idle_mean_difference': idle_mean, 'click_mean_difference': strong_mean, 'strong_wave_pixels': strong, 'pause_all_effects': True, 'keyboard': True, 'fade_out': True, 'offscreen_stops': True, 'reduced_motion': True})
         page.close()
     page = browser.new_page(viewport={'width': 390, 'height': 900}, reduced_motion='reduce')
     page.goto(BASE)

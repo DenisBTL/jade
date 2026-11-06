@@ -216,3 +216,23 @@ Ces balises ne remplacent pas le contrôle d’accès privé de l’hébergeur.
   et largeur lisibles, mouvement réduit toujours respecté.
 - Critères : paysage à x=0, y=0, largeur de fenêtre et rayon nul ; sections et pied
   de page sans cadre extérieur sur téléphone et grand écran ; animations actives.
+
+
+## Préconisation UX/UI : fondus des tableaux et vent dans la végétation
+
+- Priorité / problème : P1, les changements de fond sont trop francs et le mouvement
+  doit surtout se lire dans les arbres de la rive, comme demandé par Denis.
+- Point d’entrée : parcours vertical de l’accueil ; végétation à droite du paysage.
+- Hiérarchie : fondus statiques entre les tableaux, sans apparition au scroll ;
+  vent plus net dans les couronnes et feuilles issues des arbres, eau calme au repos.
+- États et feedback : pause globale, reprise, clic dans l’eau, mouvement réduit et
+  image fixe de secours ; aucun nouveau contrôle ou écran.
+- Données : visuel fourni au projet et feuilles décoratives, sans collecte.
+- Responsive : fondus adaptés à la hauteur disponible ; végétation et feuilles
+  recadrées avec l’image sur téléphone ; paysage toujours bord à bord.
+- Accessibilité : lisibilité des textes et des contrôles protégée, aucun clignotement,
+  pause et mouvement réduit respectés ; les fondus restent statiques.
+- Cohérence : dégradés dans les tons ivoire, beige et sable, aucun cadre ajouté.
+- Critères : pas de rupture de couleur aux jonctions ; arbres visiblement animés
+  sans mouvement du ciel ou des montagnes ; feuilles issues de la zone boisée ;
+  pause stable, grandes ondes toujours possibles et aucun débordement horizontal.
