@@ -104,7 +104,7 @@ for path,title,description,content in PAGES:
     folder.mkdir(parents=True, exist_ok=True)
     html = page(path,title,description,content).replace('/assets/style.css', '/assets/style.css?v=2')
     if path == '/':
-        html = html.replace('<body>', '<body class="home">').replace('</head>', '<link rel="stylesheet" href="/assets/home-v3.css?v=6"><script defer src="/assets/home-water.js?v=7"></script></head>')
+        html = html.replace('<body>', '<body class="home">').replace('</head>', '<link rel="stylesheet" href="/assets/home-v3.css?v=8"><script defer src="/assets/home-water.js?v=7"></script></head>')
     (folder/'index.html').write_text(html, encoding='utf-8')
 (DIST/'robots.txt').write_text('User-agent: *\nDisallow: /\n', encoding='utf-8')
 (DIST/'404.html').write_text(page('', 'Page introuvable · Jade d’Albenas', 'Retrouver le site de Jade d’Albenas.', '<section class="page-hero wrap"><p class="eyebrow">PAGE INTROUVABLE</p><h1>Reprenons<br><em>le fil.</em></h1><p>Cette page n’existe pas ou a été déplacée.</p>'+button('Revenir à l’accueil','/')+'</section>').replace('/assets/style.css', '/assets/style.css?v=2'), encoding='utf-8')

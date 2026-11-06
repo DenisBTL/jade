@@ -1,6 +1,6 @@
-﻿/* Accueil : paysage, fonds teintés et contenu essentiel. */
-.home { padding: 20px 20px 0; background: #e8e0d6; --line: #c8b9a9; }
-.home .site-header { max-width: 1560px; margin-inline: auto; background: transparent; border-bottom: 0; }
+/* Accueil : paysage, fonds teintés et contenu essentiel. */
+.home { padding: 0; background: #e8e0d6; --line: #c8b9a9; }
+.home .site-header { max-width: none; margin-inline: auto; background: transparent; border-bottom: 0; }
 .home .header-inner { min-height: 108px; }
 .home .brand { gap: 12px; font-size: 34px; }
 .home .brand img { width: 58px; height: 58px; }
@@ -8,7 +8,7 @@
 .home .brand small { font-size: 12px; letter-spacing: 1.5px; }
 .home .header-cta { border: 0; border-radius: 40px; background: #705d91; color: white; padding: 12px 22px; }
 .home .header-cta:hover { background: var(--ink); }
-.home-hero { position: relative; isolation: isolate; max-width: 1560px; margin: -108px auto 0; overflow: hidden; border-radius: 12px; background: #e9e1db; }
+.home-hero { position: relative; isolation: isolate; max-width: none; margin: -108px 0 0; overflow: hidden; border-radius: 0; background: #e9e1db; }
 .home-landscape, .home-water-canvas { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; }
 .home-landscape { object-fit: cover; object-position: center; }
 .home-water-canvas { opacity: 0; pointer-events: none; }
@@ -34,15 +34,15 @@
 .home .section-heading { align-items: start; }
 .home .section-heading h2 { max-width: 550px; }
 .home .section-aside { max-width: 55ch; }
-.home .approach-band { background: #e2d6c9; border-radius: 10px; }
+.home .approach-band { background: #e2d6c9; border-radius: 0; }
 .home .approach-grid { grid-template-columns: .9fr 1.1fr; gap: 70px; }
-.home-approach-image { width: 100%; height: 350px; object-fit: cover; border-radius: 6px; }
+.home-approach-image { width: 100%; height: 350px; object-fit: cover; border-radius: 0; }
 .home .approach-copy h2 { margin-bottom: 24px; }
-.home-questions { background: #ede5db; margin-top: 20px; border-radius: 10px 10px 0 0; }
+.home-questions { background: #ede5db; margin-top: 0; border-radius: 0; }
 .home .faq-section { gap: 70px; }
 .home .faq-list, .home details { border-color: #bdaf9f; }
 .home .text-link { border-color: #8d7aa5; }
-.home footer { margin-inline: -20px; background: #d5c7b7; color: var(--body); }
+.home footer { margin-inline: 0; background: #d5c7b7; color: var(--body); }
 .home footer h2, .home footer a, .home footer .legal-open { color: var(--ink); }
 .home footer .footer-name { color: var(--ink); }
 .home .inclusive-link img { mix-blend-mode: normal; border-radius: 3px; }
@@ -69,14 +69,14 @@
   .water-toggle { right: 24px; bottom: 24px; }
 }
 @media (max-width: 700px) {
-  .home { padding: 10px 10px 0; }
+  .home { padding: 0; }
   .home .wrap { width: calc(100% - 40px); }
   .home .header-inner { min-height: 88px; }
   .home .header-inner nav { top: 88px; }
   .home .brand { font-size: 31px; gap: 9px; }
   .home .brand img { display: block; width: 44px; height: 44px; }
   .home .brand small { font-size: 12px; letter-spacing: .5px; }
-  .home-hero { margin-top: -88px; border-radius: 8px; }
+  .home-hero { margin-top: -88px; border-radius: 0; }
   .home-hero-inner { min-height: 730px; padding-block: 145px 95px; }
   .home-hero-copy { width: 100%; }
   .home-hero h1 { font-size: clamp(35px, 6.5vw, 44px); line-height: 1.2; letter-spacing: -.8px; max-width: 520px; }
@@ -92,10 +92,10 @@
   .water-splash .water-splash-mobile { display: block; }
   .home .approach-grid { grid-template-columns: 1fr; gap: 28px; }
   .home-approach-image { height: 230px; }
-  .home .approach-band { padding-block: 30px 42px; border-radius: 8px; }
+  .home .approach-band { padding-block: 30px 42px; border-radius: 0; }
   .home .faq-section { gap: 26px; }
-  .home-questions { margin-top: 10px; border-radius: 8px 8px 0 0; }
-  .home footer { margin-inline: -10px; }
+  .home-questions { margin-top: 0; border-radius: 0; }
+  .home footer { margin-inline: 0; }
 }
 @media (max-width: 380px) {
   .home .brand img { display: none; }

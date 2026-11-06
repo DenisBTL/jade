@@ -199,3 +199,20 @@ Ces balises ne remplacent pas le contrôle d’accès privé de l’hébergeur.
 - Accessibilité : clavier, titres structurés, contrastes et mouvement réduit.
 - Critères : quatre pages et ressources disponibles sous `/jade/`, navigation et
   animations actives, compilation sans dépendance npm ni donnée de connexion.
+
+
+## Préconisation UX/UI : accueil sans cadre extérieur
+
+- Priorité / problème : P1, Denis demande un accueil sans bord visible autour du site.
+- Point d’entrée : accueil `/jade/`, dès le haut de la fenêtre.
+- Hiérarchie : paysage et fonds des sections pleine largeur ; les textes conservent
+  des marges intérieures pour leur lisibilité et leur alignement.
+- États et feedback : même contenu, navigation, eau interactive, brise et pause ;
+  suppression des marges extérieures, limites de largeur et arrondis des sections.
+- Données : aucune modification des informations ni des coordonnées manquantes.
+- Responsive : paysage au bord gauche et droit à 320, 390, 768, 1440 et 1920 px ;
+  pied de page pleine largeur et aucun défilement horizontal.
+- Accessibilité : focus visibles et formes des boutons conservés ; texte de taille
+  et largeur lisibles, mouvement réduit toujours respecté.
+- Critères : paysage à x=0, y=0, largeur de fenêtre et rayon nul ; sections et pied
+  de page sans cadre extérieur sur téléphone et grand écran ; animations actives.
